@@ -1,0 +1,11 @@
+#!/usr/bin/python3
+import sys
+
+from render_watcher import ui
+
+
+def launch_ui():
+    ui.launch_render_watcher(sys.argv)
+
+if __name__=='__main__':
+    launch_ui()
