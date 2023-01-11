@@ -1,11 +1,9 @@
-import json
-import os
-import sys
-import subprocess
-
 from PyQt5 import QtWidgets, QtCore
+import sys
 
-from katana_render_submitter import util
+from render_watcher import core
+
+
 
 #TODO/NICE TO HAVES
 '''
@@ -46,7 +44,7 @@ class RenderWatcherTree(QtWidgets.QTreeWidget):
 class RenderWatcher(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
-        self.render_data = None
+        self.selected_job = None
         layout_main = QtWidgets.QVBoxLayout()
         self.showMaximized()
         self.setLayout(layout_main)
@@ -62,42 +60,49 @@ class RenderWatcher(QtWidgets.QWidget):
         self.launch_render_button = QtWidgets.QPushButton('Launch Render')
         buttons_hbox.addWidget(self.launch_render_button)
         buttons_hbox.addWidget(self.load_job_btn)
-        self.packaged_dir = '/tlg/shows/{}/tmp'.format(util.get_shot_context())
-        self.get_render_jobs()
+        self.populate_render_job_widget()
         self.connect_signals()
 
     def connect_signals(self):
-        self.load_job_btn.clicked.connect(self.load_job)
-        self.launch_render_button.clicked.connect(self.launch_render)
+        self.load_job_btn.clicked.connect(self.load_job_btn_clicked)
+        self.launch_render_button.clicked.connect(self.launch_render_btn_clicked)
 
-    def load_job(self):
+    def load_job_btn_clicked(self):
         curent_item = self.render_job_window.currentItem()
-        if curent_item:
-            selected_cfg = curent_item.text()
-            json_file = '{}/{}'.format(self.packaged_dir, selected_cfg)
-            f = open(json_file)
-            job_data = json.load(f)
-            self.render_data = job_data
-            f.close()
-            self.tree.populate_tree(job_data)
+        if not curent_item:
+            #TODO put a dialog here
+            pass
+        id_txt = curent_item.text()
+        self.selected_job = id_txt
+        data = core.get_job_data(id_txt)
+        self.tree.populate_tree(data)
 
-    def launch_render(self):
+    def launch_render_btn_clicked(self):
         if self.tree.topLevelItemCount() == 0:
-            print ('need to load job first')
+            print('need to load job first')
             return False
-        for k, v in self.render_data.items():
-            for pass_info in v:
-                rndr_cmd = pass_info.get('batch_cmd')
-                # here we need to break this down into frame chunks
-                frames = pass_info.get('frame_range')
-                frame_range_split = frames.split('-')
-                frame_start = int(frame_range_split[0])
-                frame_end = int(frame_range_split[1])
-                frame_range_count = frame_end-frame_start
-                for frame in range(frame_start, frame_end):
-                    rndr_cmd[5] = str(frame)
-                    subprocess.run(rndr_cmd)
-                    self.update_progress(frame, pass_info.get('pass_name'))
+        data = core.get_job_data(self.selected_job)
+        core.launch_render(self, self.tree, data)
+
+
+    # def launch_render(self):
+    #     if self.tree.topLevelItemCount() == 0:
+    #         print ('need to load job first')
+    #         return False
+    #     print ('is this really running?')
+    #     for k, v in self.render_data.items():
+    #         for pass_info in v:
+    #             rndr_cmd = pass_info.get('batch_cmd')
+    #             # here we need to break this down into frame chunks
+    #             frames = pass_info.get('frame_range')
+    #             frame_range_split = frames.split('-')
+    #             frame_start = int(frame_range_split[0])
+    #             frame_end = int(frame_range_split[1])
+    #             frame_range_count = frame_end-frame_start
+    #             for frame in range(frame_start, frame_end):
+    #                 rndr_cmd[5] = str(frame)
+    #                 subprocess.run(rndr_cmd)
+    #                 self.update_progress(frame, pass_info.get('pass_name'))
 
     def update_progress(self, frame_number, pass_name):
         # get widget
@@ -115,12 +120,10 @@ class RenderWatcher(QtWidgets.QWidget):
                 break
             iterator += 1
 
+    def populate_render_job_widget(self):
+        jobs = core.get_render_jobs()
+        self.render_job_window.addItems(jobs)
 
-
-    def get_render_jobs(self):
-        jobs = [j for j in os.listdir(self.packaged_dir) if j.endswith('.json')]
-        if jobs:
-            self.render_job_window.addItems(jobs)
 
 
 def launch_render_watcher(arg):
