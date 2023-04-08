@@ -8,3 +8,10 @@ Change Log
 0.0.2 (2/12/2022)
 
 -Added support for threading, and cloud rendering, results in progress bar updates not being implemented
+
+0.0.3 (8/4/2023)
+
+-Added support for differing frame range inclinations.
+-Switched job data name to katana file name and more simplified time stamp
+-Swapped list to tree widget for job window and sorted by most recent first
+-Adding Version column

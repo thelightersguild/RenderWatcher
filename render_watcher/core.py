@@ -1,5 +1,6 @@
 import json
 import os
+import time
 import subprocess
 import threading
 
@@ -9,13 +10,18 @@ from katana_render_submitter import util
 PACKAGE_DIR = '/tlg/shows/{}/tmp'.format(util.get_shot_context())
 
 
-#TODO, want to inspect the job, create a dictionary of this, max the threads at 4?
-#e.g {job:{thread1:pass1, thread2:pass2, thread3:pass3, thread4:pass4}}
 
 def get_render_jobs():
-    jobs = [j for j in os.listdir(PACKAGE_DIR) if j.endswith('.json')]
+    jobs = {}
+    # get jobs
+    for job in os.listdir(PACKAGE_DIR):
+        if job.endswith('.json'):
+            full_path = f'{PACKAGE_DIR}/{job}'
+            jobs[job] = os.path.getmtime(full_path)
+    # sort into list by time
     if jobs:
-        return jobs
+        sorted_jobs = sorted(jobs.items(), key=lambda x: x[1], reverse=True)
+        return sorted_jobs
     else:
         return None
 
@@ -36,20 +42,16 @@ def launch_render(main_widget, tree_widget, data):
     for k, v in data.items():
         for pass_info in v:
             rndr_cmd = pass_info.get('batch_cmd')
-            # here we need to break this down into frame chunks
-            frames = pass_info.get('frame_range')
-            frame_range_split = frames.split('-')
+            #frames = pass_info.get('frame_range')
             pass_name = pass_info.get('pass_name')
-            frame_start = int(frame_range_split[0])
-            frame_end = int(frame_range_split[1])
             # run the threads
-            t = threading.Thread(target=render_thread_job, args=(main_widget, rndr_cmd, frame_start, frame_end, pass_name), daemon=False)
+            t = threading.Thread(target=render_thread_job, args=(main_widget, rndr_cmd, pass_name), daemon=False)
             t.start()
             #NON THREADED RENDER
             #render_thread_job(main_widget, rndr_cmd, frame_start, frame_end, pass_name)
 
 
-def render_thread_job(main_widget, rndr_cmd, frame_start, frame_end, pass_name):
+def render_thread_job(main_widget, rndr_cmd, pass_name):
     subprocess.run(rndr_cmd)
     #TODO this will run slower and is more efficient, but does update the progress bars.
     # for frame in range(frame_start, frame_end):

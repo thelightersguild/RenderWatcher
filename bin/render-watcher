@@ -2,6 +2,11 @@
 import sys
 
 from render_watcher import ui
+#TESTING
+# import importlib
+# from render_watcher import core
+# importlib.reload(core)
+# importlib.reload(ui)
 
 
 def launch_ui():
