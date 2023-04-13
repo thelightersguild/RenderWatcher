@@ -4,11 +4,15 @@ import time
 import subprocess
 import threading
 
+
 from katana_render_submitter import util
 
 
 PACKAGE_DIR = '/tlg/shows/{}/tmp'.format(util.get_shot_context())
 
+def get_rendered_frames(render_path):
+    """"Gets the number of rendered frames"""
+    return len(os.listdir(render_path))
 
 
 def get_render_jobs():
@@ -47,9 +51,6 @@ def launch_render(main_widget, tree_widget, data):
             # run the threads
             t = threading.Thread(target=render_thread_job, args=(main_widget, rndr_cmd, pass_name), daemon=False)
             t.start()
-            #NON THREADED RENDER
-            #render_thread_job(main_widget, rndr_cmd, frame_start, frame_end, pass_name)
-
 
 def render_thread_job(main_widget, rndr_cmd, pass_name):
     subprocess.run(rndr_cmd)

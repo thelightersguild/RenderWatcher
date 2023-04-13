@@ -15,3 +15,7 @@ Change Log
 -Switched job data name to katana file name and more simplified time stamp
 -Swapped list to tree widget for job window and sorted by most recent first
 -Adding Version column
+
+0.0.4 (9/4/2023)
+
+- reimplemented progress bar and status update
