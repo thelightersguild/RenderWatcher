@@ -1,14 +1,12 @@
 import json
 import os
-import time
 import subprocess
 import threading
 
-
 from katana_render_submitter import util
 
-
 PACKAGE_DIR = '/tlg/shows/{}/tmp'.format(util.get_shot_context())
+
 
 def get_rendered_frames(render_path):
     """"Gets the number of rendered frames"""
@@ -39,6 +37,7 @@ def get_job_data(job_id):
 
 
 def launch_render(main_widget, tree_widget, data):
+    #TODO dont need the extra arguments which arent being used
     threaded_dict = {}
     if tree_widget.topLevelItemCount() == 0:
         print ('need to load job first')
@@ -52,10 +51,6 @@ def launch_render(main_widget, tree_widget, data):
             t = threading.Thread(target=render_thread_job, args=(main_widget, rndr_cmd, pass_name), daemon=False)
             t.start()
 
+
 def render_thread_job(main_widget, rndr_cmd, pass_name):
     subprocess.run(rndr_cmd)
-    #TODO this will run slower and is more efficient, but does update the progress bars.
-    # for frame in range(frame_start, frame_end):
-    #     rndr_cmd[5] = '--t={}'.format(frame)
-    #     subprocess.run(rndr_cmd)
-    #     main_widget.update_progress(frame, pass_name)
