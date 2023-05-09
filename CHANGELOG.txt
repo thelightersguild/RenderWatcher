@@ -19,3 +19,7 @@ Change Log
 0.0.4 (9/4/2023)
 
 - reimplemented progress bar and status update
+
+0.0.5 (9/5/2023)
+
+- added file size check for render count, this is to account for 3dl cloud touching output files for permissions check

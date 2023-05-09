@@ -1,6 +1,6 @@
 from setuptools import setup
 
-VERSION = '0.0.4'
+VERSION = '0.0.5'
 DESCRIPTION = 'Render Watcher for Katana jobs'
 
 # Setting up

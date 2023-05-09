@@ -51,7 +51,7 @@ class Worker(QObject):
                     #check to see if all passes have finished rendering
                     if any(render_status.values()) is False:
                         rendering = False
-        self.launch_render_button.setEnabled(True)
+        RENDER_WATCHER.launch_render_button.setEnabled(True)
         self.finished.emit()
 
 class RenderWatcherTree(QtWidgets.QTreeWidget):
@@ -111,7 +111,7 @@ class RenderWatcher(QtWidgets.QWidget):
         self.connect_signals()
 
     def arrange_layout(self):
-        # self.showMaximized()
+        self.showMaximized()
         layout_main = QtWidgets.QVBoxLayout()
         self.setLayout(layout_main)
         view_widgets_hbox = QtWidgets.QHBoxLayout()
