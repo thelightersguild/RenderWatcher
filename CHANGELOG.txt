@@ -23,3 +23,8 @@ Change Log
 0.0.5 (9/5/2023)
 
 - added file size check for render count, this is to account for 3dl cloud touching output files for permissions check
+
+0.0.6 (24/5/2023)
+
+- Limiting threading to 2 while rendering on 1s.
+- Adding max thread limit (currently 4) for g4dn2xlarge

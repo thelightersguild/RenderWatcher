@@ -55,12 +55,12 @@ class Worker(QObject):
         self.finished.emit()
 
 class RenderWatcherTree(QtWidgets.QTreeWidget):
+    """Main widget for Render Watcher"""
     def __init__(self, parent=None):
         super(RenderWatcherTree, self).__init__(parent)
         self.setColumnCount(5)
         self.setHeaderLabels(['Job id', 'RenderPass', 'Status', 'FrameRange', 'Version', 'Progress'])
         self.status_data = dict()
-        # TODO open in expanded state
 
     def populate_tree(self, data):
         for key, values in data.items():
@@ -81,12 +81,6 @@ class RenderWatcherTree(QtWidgets.QTreeWidget):
                 progress_bar.setMinimum(0)
                 progress_bar.setMaximum(int(pass_info.get('num_frames')))
                 self.setItemWidget(child_item, 5, progress_bar)
-
-    def update_status(self):
-        pass
-
-    def update_progress(self):
-        pass
 
 
 class JobsTree(QtWidgets.QTreeWidget):
@@ -160,7 +154,7 @@ class RenderWatcher(QtWidgets.QWidget):
             print('need to load job first')
             return False
         data = core.get_job_data(self.selected_job)
-        core.launch_render(self, self.render_tree_widget, data)
+        core.launch_render(data)
         self.run_check_render_status_task()
 
 
